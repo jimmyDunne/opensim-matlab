@@ -30,12 +30,25 @@ for i = 0 : nMusc-1
         momentArm_aCoord(k+1) = myMuscle.computeMomentArm(state,aCoord);
     end
     
+    % round the numbers. This is needed because at some coordinates there
+    % are moments generated at the e-18 level. This is most likely
+    % numerical error. So to deal with this I round to 4 decimal points. 
     x = round((momentArm_aCoord*1000))/1000;
-    
-    
+    % Find the coordinate index's that are non-zero
     muscCoord = find(x ~= 0)-1;
     
-    eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates = muscCoord;' ])
+    % Cycle through each available coordinate and save its range values.
+    % These will get used later to run calculate muscle force and each
+    % coordinate value. 
+    for u = 1 : length(muscCoord)
+        % Get a reference to the coordinate
+        aCoord = myModel.getCoordinateSet.get(muscCoord(u));
+        % Create an arrary of radian value's for the range
+        coordRange = (aCoord.getRangeMin:0.01:aCoord.getRangeMax)';
+        % add the coordinate's and their range values to the structure
+        eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '= [coordRange];' ])
+    end
+    
 end 
 
 

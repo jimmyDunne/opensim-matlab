@@ -14,9 +14,8 @@ if nargin < 1
     myModel = Model(fullfile(pathname,filein));
 end
 
-state = myModel.initSystem();
-
-
+stateDefault =  myModel.initSystem();
+state =  myModel.initSystem();
 
 %% Muscle Coordinate finder
 %   Find the coordinate's that each muscle crosses. This is done by
@@ -25,47 +24,81 @@ state = myModel.initSystem();
 %   arm is non-zero.
 muscles = getCoord4Musc( myModel , state );
 
-
 %% 
+MuscNames = fieldnames(muscles);
+actualAngle=[];
 
+%%
+tic
+for ii = i : length(MuscNames)
 
-
-MuscNames = fieldnames(muscles)
-
-
-
-myForce = myModel.getMuscles().get('semimem_r');
-muscleType = char(myForce.getConcreteClassName);
-% get a reference to the concrete muscle class in the model
-eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
-
-
-   aCoord = myModel.getCoordinateSet.get(9);
-
-   updCoord = myModel.updCoordinateSet().get(9);
-
-   updCoord.setValue(state, deg2rad(0));
- 
-   updCoord.setSpeedValue(state, 0 );
-
+   muscleIndex = ii-1;
+   myForce = myModel.getMuscles().get(muscleIndex);
+   muscleType = char(myForce.getConcreteClassName);
+   % get a reference to the concrete muscle class in the model
+   eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
    
-   g
+   eval([ 'coords = muscles.' char(MuscNames(ii)) '.coordinates;' ]) 
    
-count = 1;
-for i = 0.05:0.01:1
+   display(char(myMuscle))
+   
+   for k = 1 : length(coords)
+       
+       coord = coords(k);
 
-   myForce.setActivation(state, i)
+       aCoord = myModel.getCoordinateSet.get(coord);
+       
+       updCoord = myModel.updCoordinateSet.get(coord);
+
+       tempMat =[];
+       actualAngle = [];
+       fiberlength = [];
+       normFiberLength = [];
+       activeForce =[];
+       
+       for angle = aCoord.getRangeMin :0.01: aCoord.getRangeMax
+            
+            updCoord.setValue(state, angle);
+
+            updCoord.setSpeedValue(state, 0 );
+
+            %for i = 0.05:0.01:1
+            for i = 1
+                
+               myMuscle.setActivation(state,i)
+               myMuscle.setDefaultFiberLength(0.01)
+               myMuscle.setFiberLength(state,0.01)
+
+               myModel.equilibrateMuscles(state)
+    
+               myMuscle.getActivation(state);
+               
+               fiberlength =        [fiberlength myMuscle.getFiberLength(state)];
+               normFiberLength =    [normFiberLength myMuscle.getNormalizedFiberLength(state)];
+               activeForce =        [activeForce myForce.getActiveFiberForce(state)];
+               actualAngle =        [actualAngle rad2deg(angle)];
+           
+            end
+
+       end
+       
+            activeForce     = activeForce';
+            actualAngle     = actualAngle';
+            normFiberLength = normFiberLength';
+            fiberlength     = fiberlength';
+
+            eval(['muscles.' char(myForce) '.' char(aCoord) ' = [actualAngle fiberlength normFiberLength activeForce];'])
+            
+            updCoord.setValue(state, 0);
+
+   end
    
-   state = myModel.initSystem(); 
    
-   myModel.equilibrateMuscles(state)
-   
-   activeForce(1,1) = myForce.getActiveFiberForce(state);
-   count = count+1;
 end
-   
-   
-   
+toc
+%%
+
+
      passiveForce(r) = muscles.get(12).getPassiveFiberForce(state);
    
     % force variables

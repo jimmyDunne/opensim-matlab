@@ -10,7 +10,6 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 nMusc = myModel.getMuscles().getSize();
 nCoord = myModel.getCoordinateSet().getSize();
 
-
 for i = 0 : nMusc-1
     % get the muscles type buy getting the concrete Class Name
     myForce = myModel.getMuscles().get(i);
@@ -31,7 +30,10 @@ for i = 0 : nMusc-1
         momentArm_aCoord(k+1) = myMuscle.computeMomentArm(state,aCoord);
     end
     
-    muscCoord = find(momentArm_aCoord ~= 0)-1;
+    x = round((momentArm_aCoord*1000))/1000;
+    
+    
+    muscCoord = find(x ~= 0)-1;
     
     eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates = muscCoord;' ])
 end 

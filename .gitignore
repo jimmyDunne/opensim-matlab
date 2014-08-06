@@ -45,3 +45,8 @@ Icon
 # OpenSim files
 
 *.txt
+*.log
+
+# Sublime file
+
+*.sublime*

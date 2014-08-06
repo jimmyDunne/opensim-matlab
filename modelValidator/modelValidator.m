@@ -22,10 +22,13 @@ state =  myModel.initSystem();
 %   examining the moment arm contribution of the muscle across all
 %   coordinates. A muscle will contribute to any coodinate when the moment
 %   arm is non-zero.
-muscleStruct = getCoord4Musc( myModel , state);
+muscles = getCoord4Musc( myModel , state);
 
 %% Get the force length curves of the muscles
 musclesNew = getForceLength(myModel, state, muscleStruct);
+
+
+musclesNew = getfLfV(myModel, state, muscleStruct);
 
 
 %% Get the states from a simulation and get the force-Length & force-Velocity 

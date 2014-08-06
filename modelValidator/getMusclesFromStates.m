@@ -8,119 +8,63 @@
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
+
+[filein, pathname] = uigetfile({'*.osim','osim'}, 'OSIM model file...');
+    myModel = Model(fullfile(pathname,filein));
+
 myModel = Model('D:/testInstalls/OpenSim32_64bit_VC13/Models/Gait2392_Simbody/subject01_simbody_adjusted.osim');
-statesFilePath = 'D:/testInstalls/OpenSim32_64bit_VC13/Models/Gait2392_Simbody/ResultsCMC/subject01_walk1_states.sto'
-
-
-s =  myModel.initSystem();
-
-
-%% Read in a states file as a storage object
-stateStorage = Storage([statesFilePath])
-
-% get the name of the file
-statesName = f.getName()
-
-% get the time variables
-firstTime = f.getFirstTime();
-lastTime = f.getLastTime();
-
-
-nSteps = f.getSize
-
-
-g = State()
-
-aStatesStore = Storage()
+fileToRead1 = 'C:/Users\vWin7/Documents/GitHub/stackJimmy/modelValidator/testData/subject01_walk1_states.sto';
 
 
 
-for i = 0 : nSteps - 1
+%% Import the file
+newData1 = importdata(fileToRead1);
 
-    % state = f.getStateVector(i)
-
-
-
-
-
-    myModel.formStateStorage(stateStorage, aStatesStore)
-
-    labels = aStatesStore.getColumnLabels()
-
-
-
-    numOpenSimStates = labels.getSize()-1
-
-
-    stateData = Vector();
-
-
-    stateData.resize(numOpenSimStates);
-
-     
-
-
-
-    aStatesStore.getData(i, numOpenSimStates , stateData );
-
-
-    aStatesStore.getData(i ,numOpenSimStates, &stateData[0]); // states
-    
-        // Get data into local Vector and assign to State using common utility
-        // to handle internal (non-OpenSim) states that may exist
-    
-        Array<std::string> stateNames = aStatesStore.getColumnLabels();
-
-
-        for (int j=0; j<stateData.size(); ++j){
-            // storage labels included time at index 0 so +1 to skip
-
-            aModel.setStateVariable(s, stateNames[j+1], stateData[j]);
-
-
-    % Loop through each coordinate value and get get the fibre
-           % length and force of the muscle. 
-           % for j = 1 : length( coordRange )
-           %      % Get a current coordinate value
-           %      coordValue = coordRange(j);
-           %      % Set the coordinate value in the state
-           %      updCoord.setValue(state, coordValue);
-           %      % Set the speed of the Coordinate Value
-           %      updCoord.setSpeedValue(state, 0 );
-           %      % Set the activation and fiber length
-           %      myMuscle.setActivation( state, 1 )
-           %      myMuscle.setDefaultFiberLength( 0.01 )
-           %      myMuscle.setFiberLength( state, 0.01 )
-                
-           %      % Equilibrate the forces from the activation 
-           %      myModel.equilibrateMuscles( state )
-           %      % Store all the data in the zero matrix
-           %      storageData(j,:) = [...
-           %          rad2deg(coordValue) ...                        % Coordinate Value  
-           %          myMuscle.getFiberLength(state) ...            % Fiber length
-           %          myMuscle.getNormalizedFiberLength(state) ...  % Normalized Fibre Length  
-           %          myForce.getActiveFiberForce(state)];          % Active Force
-           % end
-
-
-
-
-
-
+% Create new variables in the base workspace from those fields.
+vars = fieldnames(newData1);
+for i = 1:length(vars)
+    assignin('base', vars{i}, newData1.(vars{i}));
 end
 
+[nFrames nStates] = size(data);
 
 
+%% Get a reference to the model to state
+s =  myModel.initSystem();
 
+for u = 1 : nFrames
 
+    % Set the state time
+    s.setTime(data(1,1))    
 
+    for i = 2 : nStates
+        myModel.setStateVariable(s, char(colheaders(i)) , data(u,i) )
+    end
+ 
+    % At this point the system is only in stage ~1. To compute system
+    % dynamics we need to realize the system upwards (further
+    % reading:Simbody user manual). realize() is not exposed to users in
+    % matlab (3.2) so we call computeStateVariableDerivatives which
+    % realizes the system up to acc. 
+    myModel.computeStateVariableDerivatives(s)
+    
+    for i = 1 : nMuscles - 1
+        % get the muscles type buy getting the concrete Class Name
+        myForce = myModel.getMuscles().get(i);
+        muscleType = char(myForce.getConcreteClassName);
+        % get a reference to the concrete muscle class in the model
+        eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
+        myMuscle.getActivation(s)
+        % Equibilate the force's 
+        myModel.equilibrateMuscles( state )
+        % Store all the data in the zero matrix
+        storageData(j,:) = [...
+            rad2deg(coordValue) ...                       % Coordinate Value  
+            myMuscle.getFiberLength(state) ...            % Fiber length
+            myMuscle.getNormalizedFiberLength(state) ...  % Normalized Fibre Length  
+            myForce.getActiveFiberForce(state)];          % Active Force
+    end
+  
+    
+end
 
-
-
-
-
-
-
-
-
-%end

@@ -46,7 +46,7 @@ for i = 0 : nMusc-1
         % Create an arrary of radian value's for the range
         coordRange = (aCoord.getRangeMin:0.01:aCoord.getRangeMax)';
         % add the coordinate's and their range values to the structure
-        eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '= [coordRange];' ])
+        eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '.coordValue = [coordRange];' ])
     end
     
 end 

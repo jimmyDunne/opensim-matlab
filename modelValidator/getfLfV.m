@@ -4,11 +4,7 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 
 MuscNames = fieldnames(muscles);
 
-
-
-normVelocity = [-0.85:0.05:0.85];
-
-
+velocities = deg2rad([-120:1:120]);
 
 
 for ii = 1 : length(MuscNames)
@@ -26,20 +22,17 @@ for ii = 1 : length(MuscNames)
    coordNames = fieldnames( muscles.(MuscNames{ii}).coordinates );
    % get the number of coordinates for the muscle
    nCoords = length( coordNames ); 
-   
    % Get the maximum contraction velocity. This is in fibre length's per
    % second. 
-   velocities = normVelocity*mConVelocity
    %%
+
    for k = 1 : nCoords
        % Get the name of the coordinate
        aCoord = myModel.getCoordinateSet.get( char(coordNames(k)) );
        % Get an update reference to the coordinate
        updCoord = myModel.updCoordinateSet.get( char(coordNames(k)) );
        % Get the coordinate values from the existing structure 
-       coordRange = muscles.(MuscNames{ii}).coordinates.(coordNames{k});
-       % Create a zero matrix for storing data
-       storageData = zeros( length(coordRange), 4 );
+       coordRange = muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValue;
        
 
            % Loop through each coordinate value and get get the fibre
@@ -61,6 +54,7 @@ for ii = 1 : length(MuscNames)
 
                 
                 for i = 1 : length(velocities)
+                    
                     % Set the speed of the Coordinate Value
                     updCoord.setSpeedValue(state, velocities(i) );
 
@@ -73,6 +67,8 @@ for ii = 1 : length(MuscNames)
                     
                     % Get the Fiber velocity
                     fiberVelocity(j,i) = myMuscle.getFiberVelocity(state);
+                    % Get the Normalised Fiber Velocity 
+                    fiberVelocityNorm(j,i) = myMuscle.getNormalizedFiberVelocity(state);
                     % Get the Fiber force
                     fiberForce(j,i)    = myForce.getActiveFiberForce(state);
    
@@ -80,15 +76,15 @@ for ii = 1 : length(MuscNames)
            end
         
         % Store the coordinate value fiberLength and active Fibre force   
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValue      = coordValueArray ; 
+        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot   = coordValueArray ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlength     = fiberlength ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm = fiberlengthNorm ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocity   = fiberVelocity ; 
+        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm   = fiberVelocityNorm ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce      = fiberForce ; 
         
         % Reset the coordinate value back to zero
         updCoord.setValue(state, 0);
-        scatter3(X,Y,Z)
    end
    %%
 end 

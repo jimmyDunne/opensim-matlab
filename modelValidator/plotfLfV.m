@@ -10,7 +10,7 @@
         
         
         X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
-        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocity;
+        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberNormVelocity;
         Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
         
         

@@ -4,7 +4,7 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 
 MuscNames = fieldnames(muscles);
 
-       velocities = deg2rad( [-120:1:120], );
+       velocities = deg2rad( [-120:1:120] );
 
        
 for ii = 1 : length(MuscNames)

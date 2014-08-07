@@ -9,19 +9,13 @@
         
         
         
-        % X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
-        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
         
-        % Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
-        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordSpeedArray;
-        
+%% flfv        
+        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
+        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
         Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
         
-        
-  
         [nLen nVel] = size(X)
-        
-        
         
         hold on 
         for i = 1 : 5 :nLen
@@ -36,13 +30,37 @@
             end
             
         end
+      
+        
+%% fqfu        
+        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
+        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordSpeedArray;
+        Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
+        
+        [nLen nVel] = size(X)
+        
+        hold on 
+        for i = 1 : 5 :nLen
             
+            for u = 1 : 5 :nVel
+                
+                
+                scatter3(X(i,u),Y(i,u),Z(i,u))
+            
+            
+            
+            end
+            
+        end
+        
+        
+        
         
         
         %% 
         
-        % X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
-        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
+        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
+        %X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
         Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
         Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
         
@@ -51,6 +69,8 @@
             
             for u = 1 : 5 :nVel
                 
+                
+                u = 130
                 
                 plot( X(:,u),Z(:,u) )
             

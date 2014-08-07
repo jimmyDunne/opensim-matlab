@@ -13,7 +13,7 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
     myModel = Model(fullfile(pathname,filein));
 
 myModel = Model('D:/testInstalls/OpenSim32_64bit_VC13/Models/Gait2392_Simbody/subject01_simbody_adjusted.osim');
-fileToRead1 = 'C:/Users\vWin7/Documents/GitHub/stackJimmy/modelValidator/testData/subject01_walk1_states.sto';
+fileToRead1 = 'C:/Users\vWin7/Documents/GitHub/stackJimmy/modelValidator/testData/subject01_walk1_ik.mot';
 
 
 

@@ -4,9 +4,9 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 
 MuscNames = fieldnames(muscles);
 
-velocities = deg2rad([-120:1:120]);
+       velocities = deg2rad( [-120:1:120], );
 
-
+       
 for ii = 1 : length(MuscNames)
 
    % Get the muscle that is needed 
@@ -34,7 +34,7 @@ for ii = 1 : length(MuscNames)
        % Get the coordinate values from the existing structure 
        coordRange = muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValue;
        
-
+       
            % Loop through each coordinate value and get get the fibre
            % legnth's, fiber velocities force's. 
            for j = 1 : length( coordRange )
@@ -61,6 +61,7 @@ for ii = 1 : length(MuscNames)
                     % Equilibrate the forces from the activation 
                     myModel.equilibrateMuscles( state );
                     
+                    coordSpeedArray(j,i) = rad2deg(velocities(i));
                     coordValueArray(j,i) = rad2deg(coordValue);
                     fiberlength(j,i) = myMuscle.getFiberLength(state);
                     fiberlengthNorm(j,i) = myMuscle.getNormalizedFiberLength(state);
@@ -77,6 +78,7 @@ for ii = 1 : length(MuscNames)
         
         % Store the coordinate value fiberLength and active Fibre force   
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot   = coordValueArray ; 
+        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordSpeedArray   = coordSpeedArray ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlength     = fiberlength ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm = fiberlengthNorm ; 
         muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocity   = fiberVelocity ; 

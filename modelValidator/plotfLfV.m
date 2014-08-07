@@ -9,8 +9,12 @@
         
         
         
-        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
-        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
+        % X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
+        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
+        
+        % Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
+        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordSpeedArray;
+        
         Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
         
         
@@ -20,9 +24,9 @@
         
         
         hold on 
-        for i = 1 : nLen
+        for i = 1 : 5 :nLen
             
-            for u = 1 : nVel
+            for u = 1 : 5 :nVel
                 
                 
                 scatter3(X(i,u),Y(i,u),Z(i,u))
@@ -33,12 +37,32 @@
             
         end
             
-        scatter3(X,Y,Z)
         
         
+        %% 
+        
+        % X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm;
+        X =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot;
+        Y =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm;
+        Z =  muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce;
         
         
-        
+        for i = 1 : 5 :nLen
+            
+            for u = 1 : 5 :nVel
+                
+                
+                plot( X(:,u),Z(:,u) )
+            
+            
+                plot( Y(133,:),Z(133,:) )
+                
+                
+                
+            end
+            
+        end
+       
         
         
         

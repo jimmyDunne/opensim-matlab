@@ -24,66 +24,20 @@ state =  myModel.initSystem();
 %   arm is non-zero.
 muscles = getCoord4Musc( myModel , state);
 
-%% Get the force length curves of the muscles
-musclesNew = getForceLength(myModel, state, muscleStruct);
+%% get the force length curves of 
+
+% Get the force length curves of the muscles
+muscles = getForceLength(myModel, state, muscles);
+
+% Get the force/length curves during a motion
+muscles = getfLfromMot(myModel, muscles );
+
+% Under development or legacy functions 
+% musclesNew = getfLfV(myModel, state, muscleStruct);
+% musclesFromStates = getMusclesFromStates(myModel, statesFile, muscleStruct)
 
 
-musclesNew = getfLfV(myModel, state, muscleStruct);
-
-
-%% Get the states from a simulation and get the force-Length & force-Velocity 
-    % of each muscle  
-
-musclesFromStates = getMusclesFromStates(myModel, statesFile, muscleStruct)
-
-
-
-
-%      passiveForce(r) = muscles.get(12).getPassiveFiberForce(state);
-   
-%     % force variables
-%      getActiveFiberForce
-%      getFiberForce
-%      getTendonForce
-     
-%     % length/velocity
-%      getFiberLength
-%      getFiberVelocity
-
-%      % normalized velocity and length. 
-%      getNormalizedFiberLength
-%      getNormalizedFiberVelocity
-     
-     
-     
-
-% for i = -120:1:0
-    
-%     r = r+1;
-        
-    
-%     ;
-
-%     angle(r) = i;          
-
-% end
-
-% plot(angle,passiveForce,'r')
-
-
-% The assumptions made by the GUI/plotter are that:
-% 1. Muscle Activation(s) = 1
-% 2. Muscle FiberLength(s) = default value of .01 I believe
-
-% 3. equilibrateMuscles on the whole model is invoked. The values specified in 1. & 2. above are used as initial conditions to solve for muscle equilibrium.
-
-% Since you don't do 1 & 2 I'd expect the results to be different. 
-
-% Hope this helps,
-% -Ayman
-
-
-% end
+%% 
 
 
 
@@ -93,7 +47,6 @@ musclesFromStates = getMusclesFromStates(myModel, statesFile, muscleStruct)
 
 
 
-
-
+end
 
 

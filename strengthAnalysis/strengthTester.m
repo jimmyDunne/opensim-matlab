@@ -1,14 +1,8 @@
 
 
 
-
-
-
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
-
-
-cd('C:\Users\vWin7\Documents\GitHub\stackJimmy\strengthAnalysis')
 
 
 % Each muscle group was weakened in isolation. We reduced the maximum
@@ -26,55 +20,59 @@ cd('C:\Users\vWin7\Documents\GitHub\stackJimmy\strengthAnalysis')
 % and was expressed as a percent of the muscle group’s maximum isometric force.
 
 
-% get the path to the model and cmc setup file
-[filein, pathname1] = uigetfile({'*.osim','osim'}, 'OSIM model file...');
-myModel = Model(fullfile(pathname1,filein));
+%%
+muscles = {'vas_med_r'};
 
+%% get the path to the model and cmc setup file
+[filein1, pathname1] = uigetfile({'*.osim','osim'}, 'OSIM model file...');
 [filein, pathname] = uigetfile({'*.xml','xml'}, 'Setup model file...');
+
+% Model
+myModel = Model(fullfile(pathname1,filein1));
+myModel.initSystem();
+% CMC Tool
 cmcTool = CMCTool(fullfile(pathname,filein));
 
 
-muscle = {'vas_med_r'};
-startingStrength = [1294 500];
 
-t = []; % matrix of joint torques
-q = []; % a matrix of all the coordinate values
+for ii = 1 : length(muscles)
 
-%% Use bisection method to converge on criteria
-eps_abs = 1e-5;
-eps_step = 1e-5;
-a = startingStrength(1);
-b = startingStrength(2);
+    %% change the musle strength of the model
+    a = myModel.getMuscles.get( char(muscles(ii)) ).getMaxIsometricForce ;
+    b = a/2;
+    % run the max and min CMC results
+    [t_n q_n] = runCMCtool(a, myModel, cmcTool, char(muscles(ii)) , pathname);
 
-% run the max and min CMC results
-[t_n q_n] = runCMCtool(a, myModel, mySetup, muscle, pathname);
-
-%% do the comparisons
-satisfyQs = compareCoodinates(q, q_n);
-satisfyTs = compareTorques(t,t_n);
-
-while stepsize > 0.5 || satisfyQs == 1 && satisfyTs == 1
-
-       c = (a - b)/2;
+    stepsize = 1;
+    satisfyQs  = 0;
+    satisfyTs  = 0;
     
+    %%
+    while stepsize > 0.5 || satisfyQs == 1 && satisfyTs == 1
+
+           c = b;
+
+
+        if satisfyQs == 0 && satisfyTs == 0
+
+            a = a;
+            b = c;
+
+        elseif satisfyQs == 1 && satisfyTs == 1
+
+            a = b;
+            b = b/2;
+
+        end
+
+        % calculate the the step size
+        stepsize = abs(a - b);
+        % run CMC with new strength
+        [t_n q_n] = runCMCtool(b, myModel, mySetupFile, muscle);
+        % do the comparisons
+        satisfyQs = compareCoodinates(q, q_n);
+        satisfyTs = compareTorques(t, t_n);
     
-    if satisfyQs == 0 && satisfyTs == 0
-    
-        a = a;
-        b = c;
-        
-    elseif satisfyQs == 1 && satisfyTs == 1
-        
-        a = b;
-        b = b/2;
-        
     end
-
-    % calculate the the step size
-    stepsize = abs(a - b);
-    % run CMC with new strength
-    [t_n q_n] = runCMCtool(b, myModel, mySetupFile, muscle);
-    % do the comparisons
-    satisfyQs = compareCoodinates(q, q_n);
-    satisfyTs = compareTorques(t, t_n);
+    %%
 end

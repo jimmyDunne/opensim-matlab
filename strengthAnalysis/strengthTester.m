@@ -21,16 +21,20 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 %%
 muscles = {'vas_med_r'};
 
+excludeList = {'subtalar_angle_r_reserve' 'mtp_angle_r_reserve' 'subtalar_angle_l_reserve' 'mtp_angle_l_reserve'};
+
 %% get the path to the model and cmc setup file
-[filein1, pathname1] = uigetfile({'*.osim','osim'}, 'OSIM model file...');
-[filein, pathname] = uigetfile({'*.xml','xml'}, 'Setup model file...');
+[filein1, pathname] = uigetfile({'*.osim','osim'}, 'OSIM model file...');
+[filein2, pathname2] = uigetfile({'*.xml','xml'}, 'CMC setup file...');
+[filein3, pathname3] = uigetfile({'*.sto','sto'}, 'ID results file...');
 
 % Model
-myModel = Model(fullfile(pathname1,filein1));
+myModel = Model(fullfile(pathname,filein1));
 myModel.initSystem();
 % CMC Tool
-cmcTool = CMCTool(fullfile(pathname,filein));
-
+cmcTool = CMCTool(fullfile(pathname2,filein2));
+% Inverse Dynamics
+m = importdata(fullfile(pathname3,filein3));
 
 
 for ii = 1 : length(muscles)
@@ -41,41 +45,41 @@ for ii = 1 : length(muscles)
     
     b = a/2;
     % run the max and min CMC results
-    [t_n q_n] = runCMCtool(a, myModel, cmcTool, char(muscles(ii)) , pathname);
+    [t q] = runCMCtool(a, myModel, cmcTool, char(muscles(ii)) , pathname);
 
     stepsize = 1;
-    satisfyQs  = 0;
-    satisfyTs  = 0;
+    satisfyQs  = 1;
+    satisfyTs  = 1;
     
     %%
-    while stepsize > 0.5 || satisfyQs == 1 && satisfyTs == 1
-
-           c = b;
-
+    while stepsize > 0.5 
+        
+           currentStepSize = a/2;
 
         if satisfyQs == 0 && satisfyTs == 0
 
-            a = a;
-            b = c;
+            b = a + currentStepSize;
 
         elseif satisfyQs == 1 && satisfyTs == 1
 
-            a = b;
-            b = b/2;
+            b = a - currentStepSize;
 
         end
-
+        display( num2str(a) );
+        
         % calculate the the step size
         stepsize = abs(a - b);
         % change the muscle strength of the model 
         myModel.getMuscles.get( char(muscles(ii)) ).setMaxIsometricForce(b) ;
         myModel.initSystem();
         % run CMC with new strength
-        cmcTool = CMCTool(fullfile(pathname,filein));
-        [t q] = runCMCtool(b, myModel, cmcTool, char(muscles(ii)) , pathname);
+        cmcTool = CMCTool(fullfile(pathname2,filein2));
+        [t_n q_n] = runCMCtool(b, myModel, cmcTool, char(muscles(ii)) , pathname);
         % do the comparisons
-        [satisfyQs satisfyTs] = compareQsAndTs(q, q_n, t, t_n);
-         
+        [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList);
+        
+        a = b;
+        stepsize = currentStepSize;
     end
     %%
 end

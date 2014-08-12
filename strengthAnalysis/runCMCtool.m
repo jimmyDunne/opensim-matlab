@@ -3,10 +3,6 @@ function [torqueDta coordData] = runCMCtool(mStrength, myModel, cmcTool, muscles
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
 
-%% change the muscle strength
-    myModel.getMuscles().get( char(muscles) ).setMaxIsometricForce(mStrength)
-    myModel.initSystem();
-
 %% set the path's for some variables
 
     controlConstraintsPath  = fullfile(pathname,'gait2392_CMC_ControlConstraints.xml'  );
@@ -23,10 +19,10 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
     cmcTool.setTaskSetFileName(tasksPath);
     cmcTool.setDesiredKinematicsFileName(coordinatesFilePath);
     cmcTool.setInitialTime(0.53);
-    cmcTool.setFinalTime(0.74);
+    cmcTool.setFinalTime(0.7);
     cmcTool.setResultsDir(resultsPath);
     cmcTool.setExternalLoadsFileName(externalLoadFilePath);
-
+    cmcTool.setName('subject01')
     % Save the settings in a setup file
     % outfile = ['setup_CMC_new5.xml'];
     % cmcTool.print([pathname outfile]);
@@ -38,13 +34,12 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 %% read in results and save to q and t
 
     torqueDta = importdata( fullfile( pathname, 'ResultsCMC', ['testRun_' num2str(mStrength)], 'subject01_Actuation_force.sto'));
-    torqueDta = torqueDta.data;
     coordData = importdata( fullfile( pathname, 'ResultsCMC', ['testRun_' num2str(mStrength)], 'subject01_Kinematics_q.sto'   ));
-    coordData = coordData.data;
 
 %% Print the Model to the cmc folder
 
     myModel.print(fullfile( pathname, 'ResultsCMC', ['testRun_' num2str(mStrength)], 'myModel.osim'   ))
     
-    
+    load chirp 
+    sound(y,Fs)
 end

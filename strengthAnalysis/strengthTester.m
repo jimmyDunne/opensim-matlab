@@ -3,8 +3,6 @@
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
-
-
 % Each muscle group was weakened in isolation. We reduced the maximum
 % isometric force until the CMC algorithm could no longer determine a set of muscle
 % excitations that would recreate the subject’s dynamics with an error less than 2 degrees for all
@@ -39,6 +37,8 @@ for ii = 1 : length(muscles)
 
     %% change the musle strength of the model
     a = myModel.getMuscles.get( char(muscles(ii)) ).getMaxIsometricForce ;
+    myModel.initSystem();
+    
     b = a/2;
     % run the max and min CMC results
     [t_n q_n] = runCMCtool(a, myModel, cmcTool, char(muscles(ii)) , pathname);
@@ -67,12 +67,15 @@ for ii = 1 : length(muscles)
 
         % calculate the the step size
         stepsize = abs(a - b);
+        % change the muscle strength of the model 
+        myModel.getMuscles.get( char(muscles(ii)) ).setMaxIsometricForce(b) ;
+        myModel.initSystem();
         % run CMC with new strength
-        [t_n q_n] = runCMCtool(b, myModel, mySetupFile, muscle);
+        cmcTool = CMCTool(fullfile(pathname,filein));
+        [t q] = runCMCtool(b, myModel, cmcTool, char(muscles(ii)) , pathname);
         % do the comparisons
-        satisfyQs = compareCoodinates(q, q_n);
-        satisfyTs = compareTorques(t, t_n);
-    
+        [satisfyQs satisfyTs] = compareQsAndTs(q, q_n, t, t_n);
+         
     end
     %%
 end

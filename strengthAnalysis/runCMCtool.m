@@ -42,4 +42,9 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
     coordData = importdata( fullfile( pathname, 'ResultsCMC', ['testRun_' num2str(mStrength)], 'subject01_Kinematics_q.sto'   ));
     coordData = coordData.data;
 
+%% Print the Model to the cmc folder
+
+    myModel.print(fullfile( pathname, 'ResultsCMC', ['testRun_' num2str(mStrength)], 'myModel.osim'   ))
+    
+    
 end

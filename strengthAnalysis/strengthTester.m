@@ -52,7 +52,7 @@ while abs(stepsize(1)-stepsize(2)) > 1
         display(['mCapacity; ' num2str(currentValue)]);
     end
     
-    stepSize(1) = currentValue;
+    stepsize(1) = currentValue;
     
     if satisfyQs == 1 && satisfyTs == 1
         maxValue = currentValue;
@@ -72,7 +72,7 @@ while abs(stepsize(1)-stepsize(2)) > 1
     
     
     nSteps = nSteps+1;
-    if nSteps == 4
+    if nSteps == 10
         break
     end
 end

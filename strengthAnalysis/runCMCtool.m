@@ -1,20 +1,39 @@
-function [torqueDta coordData] = runCMCtool(mStrength, pathname,resultsFolder, filein , modelFilePath)
+function [t q] = runCMCtool(pathname,resultsFolder,muscles,n,cmcName,modelName)
 
     import org.opensim.modeling.*      % Import OpenSim Libraries
+%% Model
+    % get the paths to the model and setup files
+    modelPath = fullfile(pathname, modelName);
+    % create instance of the model 
+    myModel = Model(modelPath);
+    myModel.initSystem();
+    % make the scaling factor a decimal (if 100% then 1, if 50% then 0.5
+    scalingFactor = n/100;
+    % multiply all muscles in the model by the scaling factor n
+    for ii = 1 : length(muscles)
+        b = myModel.getMuscles.get( muscles{ii} ).getMaxIsometricForce ;
+        myModel.getMuscles.get( muscles{ii} ).setMaxIsometricForce( b*scalingFactor ) ;
+    end
+    % Print the model out to the results file, ready to be used by the
+    % cmcTool
+    modelOutputPath = fullfile(pathname, resultsFolder, ['myModel_' num2str(round(n)) '.osim']) ;
+    myModel.print(modelOutputPath);
+    
+%% CMC Tool 
+    cmcPath   = fullfile(pathname, cmcName );
+    % create an instance of the cmcTool
+    cmcTool = CMCTool(cmcPath);
 
-    cmcTool = CMCTool(fullfile(pathname,resultsFolder, filein));
-
-%% set the path's for some variables
-
+    % set the path's for some variables
     controlConstraintsPath  = fullfile(pathname,'gait2392_CMC_ControlConstraints.xml'  );
     tasksPath               = fullfile(pathname,'gait2392_CMC_Tasks.xml' );
     externalLoadFilePath    = fullfile(pathname,'subject01_walk1_grf.xml');
     coordinatesFilePath     = fullfile(pathname,'ResultsRRA', 'subject01_walk1_RRA_Kinematics_q.sto' );
-    resultsPath             = fullfile(pathname,resultsFolder, ['testRun_' num2str(mStrength)]);
+    resultsPath             = fullfile(pathname,resultsFolder, ['testRun_' num2str(n)]);
     
 %% Change the output folder path from CMCSetup
 
-    cmcTool.setModelFilename(modelFilePath);
+    cmcTool.setModelFilename(modelOutputPath);
     cmcTool.setConstraintsFileName(controlConstraintsPath);
     cmcTool.setTaskSetFileName(tasksPath);
     cmcTool.setDesiredKinematicsFileName(coordinatesFilePath);
@@ -24,19 +43,21 @@ function [torqueDta coordData] = runCMCtool(mStrength, pathname,resultsFolder, f
     cmcTool.setExternalLoadsFileName(externalLoadFilePath);
     cmcTool.setName('subject01')
     % Save the settings in a setup file
-    cmcTool.print( fullfile(pathname, resultsFolder, filein));
-    cmcTool = CMCTool(fullfile(pathname, resultsFolder, filein));
+    cmcTool.print( fullfile(pathname, resultsFolder, cmcName));
+    cmcTool = CMCTool(fullfile(pathname, resultsFolder, cmcName));
 
 %% run cmc
     cmcTool.run()
 
 %% read in results and save to q and t
 
-    torqueDta = importdata( fullfile( pathname, resultsFolder, ['testRun_' num2str(mStrength)], 'subject01_Actuation_force.sto'));
-    coordData = importdata( fullfile( pathname, resultsFolder, ['testRun_' num2str(mStrength)], 'subject01_Kinematics_q.sto'   ));
+    t = importdata( fullfile( pathname, resultsFolder, ['testRun_' num2str(n)], 'subject01_Actuation_force.sto'));
+    q = importdata( fullfile( pathname, resultsFolder, ['testRun_' num2str(n)], 'subject01_Kinematics_q.sto'   ));
 
 %% Print the Model to the cmc folder
 
     load chirp 
     sound(y,Fs)
+
+
 end

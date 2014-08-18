@@ -29,7 +29,7 @@ function [t q] = runCMCtool(pathname,resultsFolder,muscles,n,cmcName,modelName)
     forceSetFiles           = fullfile(pathname,'cmc_actuators_gait_23dofs_92muscles_patella.xml' );
     tasksPath               = fullfile(pathname,'tasks.xml' );
     externalLoadFilePath    = fullfile(pathname,'external_loads.xml');
-    coordinatesFilePath     = fullfile(pathname,'loadedwalking_subject07_noload_free_trial02_rrakin_Kinematics_q.sto' );
+    coordinatesFilePath     = fullfile(pathname,'loadedwalking_subject07_noload_free_trial01_rrakin_Kinematics_q.sto' );
     resultsPath             = fullfile(pathname,resultsFolder, ['testRun_' num2str(n)]);
     
 %% Change the output folder path from CMCSetup
@@ -39,8 +39,8 @@ function [t q] = runCMCtool(pathname,resultsFolder,muscles,n,cmcName,modelName)
     cmcTool.setTaskSetFileName(tasksPath);
     cmcTool.setDesiredKinematicsFileName(coordinatesFilePath);
     %cmcTool.setForceSetFiles(forceSetFiles)
-    cmcTool.setInitialTime(0.5500);
-    cmcTool.setFinalTime(1.115);
+    cmcTool.setInitialTime(0.500);
+    cmcTool.setFinalTime(1.6);
     cmcTool.setResultsDir(resultsPath);
     cmcTool.setExternalLoadsFileName(externalLoadFilePath);
     cmcTool.setName('subject01')

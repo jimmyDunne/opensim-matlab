@@ -19,7 +19,6 @@ satisfyTs = 1;
 
 %% Create time series objects from both data sources and synchronize
 
-
 % coordinate data
 oCoordTimeSeries = timeseries(qData(:,2:end),qData(:,1),'Name','coodsO');
 nCoordTimeSeries = timeseries(q_nData(:,2:end),q_nData(:,1),'Name','coordsN');
@@ -60,9 +59,11 @@ for i = 1 : length(mHeaders)
         s = mHeaders{i}(1:k(2)-1);
     elseif length(k) == 3
         s = mHeaders{i}(1:k(3)-1);
+    elseif length(k) > 3
+        continue
     end
     % find the reference to that name in the torque headers
-    g = strmatch(s, tHeaders);
+    g = strmatch(['reserve_' s], tHeaders);
     tHeaders{g};
     if isempty(g)
        continue
@@ -91,7 +92,8 @@ for i = 1 : length(mHeaders)
         display([ tHeaders{g} ' Max reserve is ' num2str(max(reserveTorque)) ' and the Max Joint Moment is ' num2str(max(jointMoment)) ])
         break
     end
-    
+    jointMoment=[];
+    reserveTorque=[];
 end
 
 end

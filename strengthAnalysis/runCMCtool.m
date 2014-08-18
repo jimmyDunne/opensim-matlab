@@ -25,29 +25,31 @@ function [t q] = runCMCtool(pathname,resultsFolder,muscles,n,cmcName,modelName)
     cmcTool = CMCTool(cmcPath);
 
     % set the path's for some variables
-    controlConstraintsPath  = fullfile(pathname,'gait2392_CMC_ControlConstraints.xml'  );
-    tasksPath               = fullfile(pathname,'gait2392_CMC_Tasks.xml' );
-    externalLoadFilePath    = fullfile(pathname,'subject01_walk1_grf.xml');
-    coordinatesFilePath     = fullfile(pathname,'ResultsRRA', 'subject01_walk1_RRA_Kinematics_q.sto' );
+    %controlConstraintsPath  = fullfile(pathname,'gait2392_CMC_ControlConstraints.xml'  );
+    forceSetFiles           = fullfile(pathname,'cmc_actuators_gait_23dofs_92muscles_patella.xml' );
+    tasksPath               = fullfile(pathname,'tasks.xml' );
+    externalLoadFilePath    = fullfile(pathname,'external_loads.xml');
+    coordinatesFilePath     = fullfile(pathname,'loadedwalking_subject07_noload_free_trial02_rrakin_Kinematics_q.sto' );
     resultsPath             = fullfile(pathname,resultsFolder, ['testRun_' num2str(n)]);
     
 %% Change the output folder path from CMCSetup
 
     cmcTool.setModelFilename(modelOutputPath);
-    cmcTool.setConstraintsFileName(controlConstraintsPath);
+    %cmcTool.setConstraintsFileName(controlConstraintsPath);
     cmcTool.setTaskSetFileName(tasksPath);
     cmcTool.setDesiredKinematicsFileName(coordinatesFilePath);
-    cmcTool.setInitialTime(0.53);
-    cmcTool.setFinalTime(0.7);
+    %cmcTool.setForceSetFiles(forceSetFiles)
+    cmcTool.setInitialTime(0.5500);
+    cmcTool.setFinalTime(1.115);
     cmcTool.setResultsDir(resultsPath);
     cmcTool.setExternalLoadsFileName(externalLoadFilePath);
     cmcTool.setName('subject01')
-    % Save the settings in a setup file
+    %Save the settings in a setup file
     cmcTool.print( fullfile(pathname, resultsFolder, cmcName));
     cmcTool = CMCTool(fullfile(pathname, resultsFolder, cmcName));
 
 %% run cmc
-    cmcTool.run()
+    cmcTool.run();
 
 %% read in results and save to q and t
 

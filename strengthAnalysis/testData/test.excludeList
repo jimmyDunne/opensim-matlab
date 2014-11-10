@@ -1,0 +1,13 @@
+reserve_arm_flex_r
+reserve_arm_add_r
+reserve_arm_rot_r
+reserve_elbow_flex_r
+reserve_arm_flex_l
+reserve_arm_add_l
+reserve_arm_rot_l
+reserve_elbow_flex_l
+reserve_lumbar_extension
+reserve_lumbar_bending
+reserve_lumbar_rotation
+reserve_pro_sup_r
+reserve_pro_sup_l 

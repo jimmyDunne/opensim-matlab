@@ -47,11 +47,6 @@ Icon
 *.txt
 *.log
 
-*.trc
-*.mot
-*.osim
-*.sto
-*.xml
 
 # Sublime file
 

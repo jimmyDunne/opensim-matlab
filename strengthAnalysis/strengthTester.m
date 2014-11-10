@@ -20,21 +20,23 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 % get the path to the model
 [modelName, homeFolder] = uigetfile('*.osim', 'OSIM model file...');
 [cmcSetupName, homeFolder]   = uigetfile({'*.xml'}, 'CMC setup file...',homeFolder);
+[idName, homeFolder]   = uigetfile({'*.sto'}, 'CMC setup file...',homeFolder);
 cd(homeFolder);
 
 % Inverse Dynamics
-%m = importdata(fullfile(pathname3,idName));
+
+m = importdata(fullfile(homeFolder,idName));
 
 
 %% get muscle ans exclusion names
-[muscGroups excludeNames] = readGroupNames;
+[muscGroups excludeList] = readGroupNames;
 
 %%
 groupNames = fieldnames(muscGroups);
 nGroups    = length(groupNames);
 
 for i = 1 : nGroups
-
+    display( char(groupNames{i}) );
     % Results folder name
     workingFolder = fullfile(homeFolder,[ 'ResultsCMC_' char(groupNames{i})]) ;
 
@@ -46,7 +48,6 @@ for i = 1 : nGroups
         mkdir(workingFolder)
     end
 
-    
     maxValue        = 100;
     lowestValue     = 1;
     stepSize        = 5;
@@ -58,25 +59,21 @@ for i = 1 : nGroups
     % Scale the muscle strength (none, in this case) and print a copy of 
     % the model
     display(['mCapacity; ' num2str(100)]);
-    % Get the path to the original model
-    modelPath = fullfile(homeFolder, modelName);
-    % Copy, scale the muscles, and print Model to the working Folder
-    modelOutputPath = strengthScaler(modelPath,muscleNames,100,workingFolder);
-    % Run CMC on the new copied model, printing the results to a
-    % sub-directory of the working folder. 
-    [t q] = runCMCtool(homeFolder,cmcSetupName,modelOutputPath);
-
-
+    % Do all the computations related to OpenSim
+    [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,100 );
     % Run more CMC trials, using a biesection method. Method will end when the
-      % step size, as a percentage of max strength, is less than 1.
+    % step size, as a percentage of max strength, is less than 1.
     while abs(stepSize(1)-stepSize(2)) > 1
 
         if nSteps == 1
             display(['mCapacity; ' num2str(currentValue)]);
-            [t_n q_n] = runCMCtool(homeFolder,workingFolder,muscleNames,currentValue,cmcSetupName,modelName);
+            % Do the OpenSim computes    
+            [t_n q_n] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,currentValue );
+            % Compare the current q's and t's and see if they satisfy the
+            % criteria conditions.
             [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList);
         end
-
+        
         stepSize(1) = currentValue;
 
         if satisfyQs == 1 && satisfyTs == 1
@@ -89,13 +86,14 @@ for i = 1 : nGroups
 
         % Send some of the results to the display
         display(['mCapacity; ' num2str(currentValue)]);
-        % run again
-        [t_n q_n] = runCMCtool(homeFolder,workingFolder,muscleNames,currentValue,cmcSetupName,modelName);
+        
+        % Do the OpenSim computes    
+        [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,currentValue );
+        % Compare the current q's and t's and see if they satisfy the
+        % criteria conditions.
         [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList);
-
-
+        
         stepSize(2) = currentValue;
-
 
         nSteps = nSteps+1;
         if nSteps == 10
@@ -107,3 +105,7 @@ end
 
 load Handel
 sound(y,Fs)
+
+end
+
+

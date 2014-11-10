@@ -37,7 +37,7 @@ mData = mTimeSeries.data;
 mHeaders(1) =[];
 tHeaders(1) =[];
 
-%% Go through frames
+%% Go through time frames
 [nFrames nQs] = size(qData);
 for i = 1 : nFrames
     coordDiff = sum(qData(i,:) - q_nData(i,:)) ;  
@@ -54,7 +54,7 @@ end
 for i = 1 : length(mHeaders)
     % get the index for '_'
     k = strfind(mHeaders{i}, '_');
-    % get teh component of the header name
+    % get the component of the header name
     if length(k) == 2
         s = mHeaders{i}(1:k(2)-1);
     elseif length(k) == 3

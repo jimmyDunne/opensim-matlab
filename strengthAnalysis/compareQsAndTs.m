@@ -1,4 +1,4 @@
-function [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t, excludeList)
+function [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList)
 
 % original coordinates 
 qData = q.data;
@@ -7,12 +7,11 @@ qHeaders = q.colheaders;
 q_nData = q_n.data;
 q_nHeaders = q_n.colheaders;
 % new torques
-tData = t.data;
-tHeaders = t.colheaders;
+tData = t_n.data;
+tHeaders = t_n.colheaders;
 % joint moments from ID
 mData = m.data;
 mHeaders = m.colheaders;
-
 
 satisfyQs = 1;
 satisfyTs = 1;
@@ -76,6 +75,11 @@ for i = 1 : length(mHeaders)
     % get the joint moment and reserve toque for that coordinate
     jointMoment   = mData(:,i);
     reserveTorque = tData(:,g); 
+    
+%     hold 
+%     plot(jointMoment,'r')
+%     plot(reserveTorque,'k')
+    
     % determine the percentage of the jointtorque to required joint moment
     % for each frame
     %     torquePercentage = abs((reserveTorque./jointMoment)*100);
@@ -89,7 +93,7 @@ for i = 1 : length(mHeaders)
     
     if (max(abs(reserveTorque))/max(abs(jointMoment)) )*100 > 10
         satisfyTs = 0;
-        display([ tHeaders{g} ' Max reserve is ' num2str(max(reserveTorque)) ' and the Max Joint Moment is ' num2str(max(jointMoment)) ])
+        display([tHeaders{g} ' exceeds 10% of joint torque'])
         break
     end
     jointMoment=[];

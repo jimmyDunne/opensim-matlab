@@ -1,4 +1,4 @@
-function strengthTester()
+function Results = strengthTester(homeFolder, modelName, cmcSetupName, idName, c)
 % Each muscle group was weakened in isolation. We reduced the maximum
 % isometric force until the CMC algorithm could no longer determine a set of muscle
 % excitations that would recreate the subject's dynamics with an error less than 2 degrees for all
@@ -18,16 +18,18 @@ import org.opensim.modeling.*      % Import OpenSim Libraries
 %% get the path to the model and cmc setup file
 
 % get the path to the model
-[modelName, homeFolder] = uigetfile('*.osim', 'OSIM model file...');
-[cmcSetupName, homeFolder]   = uigetfile({'*.xml'}, 'CMC setup file...',homeFolder);
-[idName, homeFolder]   = uigetfile({'*.sto'}, 'CMC setup file...',homeFolder);
-cd(homeFolder);
-
+if ~nargin 
+    [modelName, homeFolder] = uigetfile('*.osim', 'OSIM model file...');
+    [cmcSetupName, homeFolder]   = uigetfile({'*.xml'}, 'CMC setup file...',homeFolder);
+    [idName, homeFolder]   = uigetfile({'*.sto'}, 'Inverse Dynamics...',homeFolder);
+    cd(homeFolder);
+    c = 1;
+end
 % Inverse Dynamics
 
 m = importdata(fullfile(homeFolder,idName));
 
-
+cd(homeFolder)
 %% get muscle ans exclusion names
 [muscGroups excludeList] = readGroupNames;
 
@@ -48,64 +50,45 @@ for i = 1 : nGroups
         mkdir(workingFolder)
     end
 
-    maxValue        = 100;
-    lowestValue     = 1;
-    stepSize        = 5;
-    currentValue    = midpoint(maxValue, lowestValue);
-    nSteps          = 1;
-    stepSize        =[maxValue currentValue];
-    muscleNames     = muscGroups.(groupNames{i});
+   lastValue       = [105 100]; % what the last value was 
+   currentValue    = 50;
+   muscleNames     = muscGroups.(groupNames{i});
 
-    % Scale the muscle strength (none, in this case) and print a copy of 
-    % the model
-    display(['mCapacity; ' num2str(100)]);
-    % Do all the computations related to OpenSim
-    [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,100 );
-    % Run more CMC trials, using a biesection method. Method will end when the
-    % step size, as a percentage of max strength, is less than 1.
-    while abs(stepSize(1)-stepSize(2)) > 1
-
-        if nSteps == 1
-            display(['mCapacity; ' num2str(currentValue)]);
-            % Do the OpenSim computes    
-            [t_n q_n] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,currentValue );
-            % Compare the current q's and t's and see if they satisfy the
-            % criteria conditions.
-            [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList);
-        end
-        
-        stepSize(1) = currentValue;
-
-        if satisfyQs == 1 && satisfyTs == 1
-            maxValue = currentValue;
-            currentValue = midpoint(currentValue, lowestValue );
-        elseif satisfyQs == 0 || satisfyTs == 0
-            lowestValue  = currentValue;
-            currentValue = midpoint(maxValue,currentValue );
-        end
-
-        % Send some of the results to the display
-        display(['mCapacity; ' num2str(currentValue)]);
-        
-        % Do the OpenSim computes    
+   % Do all the computations related to OpenSim
+   [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,100 );
+    
+ 
+    while abs(lastValue(end)-lastValue(end-1)) > 1
+    
+        % Do a simulation and get the q's and t's
         [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,currentValue );
-        % Compare the current q's and t's and see if they satisfy the
-        % criteria conditions.
-        [satisfyQs satisfyTs] = compareQsAndTs(q, m, q_n, t_n, excludeList);
+
+        % See if the torques and q's are satisfied
+        [satisfyQs satisfyTs] = compareQsAndTs(q, m, q, t, excludeList);
+
+        % calculate the strengh difference between simulations
+        strengthChange = abs(diff([lastValue(end) currentValue]));
         
-        stepSize(2) = currentValue;
+        % add the current strength value the array
+        lastValue = [lastValue currentValue];
 
-        nSteps = nSteps+1;
-        if nSteps == 10
-            break
+        if satisfyQs && satisfyTs % if the coordinates and torques are satisfied
+            % decrease the strength by half the difference 
+            currentValue = currentValue -  (strengthChange/2);        %     
+        elseif ~satisfyQs || ~satisfyTs % if they aren't satisfied
+            % increase the strength by half the difference 
+            currentValue = currentValue +  (strengthChange/2);       % 
         end
-    end
 
+    end  
+    
+    Results(i,c) =  lastValue(end);
+ 
 end
-
+   
+    
 load Handel
 sound(y,Fs)
 
 end
-
 

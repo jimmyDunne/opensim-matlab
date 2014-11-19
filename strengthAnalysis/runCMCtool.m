@@ -28,7 +28,6 @@ cmcTool = CMCTool( [workingFolder '\testSetup.xml'] );
 cmcTool.run();
 
 clear cmcTool
-close cmcTool
 java.lang.System.gc()
 
 

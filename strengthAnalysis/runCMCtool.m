@@ -27,7 +27,11 @@ cmcTool.print([workingFolder '\testSetup.xml'] );
 cmcTool = CMCTool( [workingFolder '\testSetup.xml'] );
 cmcTool.run();
 
-close all
+clear cmcTool
+close cmcTool
+java.lang.System.gc()
+
+
 %% Success noise
 load chirp 
 sound(y,Fs)

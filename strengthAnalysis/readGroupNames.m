@@ -1,4 +1,4 @@
-function [muscNames excludeNames] = readGroupNames
+function [muscNames,excludeNames] = readGroupNames
 
 currentFolder    = cd;
 existMusclesFile = [];

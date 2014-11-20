@@ -1,4 +1,4 @@
-function resultsFolderPath =  runCMCtool(path2setupFile, modelOutputPath, resultsFolder)
+function resultsFolderPath =  runCMCtool(path2setupFile, modelOutputPath, resultsFolder,addName)
 
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
@@ -23,8 +23,8 @@ cmcTool.setName('')
 
 display('Running CMC....')
 %% Run CMC
-cmcTool.print([workingFolder '\testSetup.xml'] );
-cmcTool = CMCTool( [workingFolder '\testSetup.xml'] );
+cmcTool.print([workingFolder '\testSetup_' addName '.xml'] );
+cmcTool = CMCTool( [workingFolder '\testSetup_' addName '.xml'] );
 cmcTool.run();
 
 clear cmcTool

@@ -1,4 +1,4 @@
-function modelOutputPath = strengthScaler(modelPath,muscles,n,resultsFolder)
+function modelOutputPath = strengthScaler(modelPath,muscles,n,resultsFolder,addName)
 
 % Import OpenSim Libraries
 import org.opensim.modeling.*      
@@ -24,7 +24,7 @@ end
 
 % Print the model out to the results file, ready to be used by the
 % cmcTool
-modelOutputPath = fullfile(resultsFolder, ['myModel_' num2str(round(n)) '.osim']) ;
+modelOutputPath = fullfile(resultsFolder, ['myModel_' addName '_' num2str(round(n)) '.osim']) ;
 myModel.print(modelOutputPath);
 
 display('model printed')

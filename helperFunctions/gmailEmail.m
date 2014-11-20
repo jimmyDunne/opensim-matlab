@@ -24,7 +24,7 @@ function recipient = gmailEmail(recipient, message, subject, sender, psswd)
  
  
 if nargin<4
-    sender = 'dunne.jimmy@gmail.com';
+    sender = 'example_address';
     psswd = 'password_of_dummy_address';
 end
  

@@ -1,6 +1,11 @@
-function [muscNames,excludeNames] = readGroupNames
+function [muscNames,excludeNames] = readGroupNames(path2Folder);
 
+if nargin == 1
+    cd(path2Folder)
+end
 currentFolder    = cd;
+
+
 existMusclesFile = [];
 existExcludeFile = [];
 

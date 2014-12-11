@@ -1,4 +1,4 @@
-function [Results,elapsedTime]= strengthTester_para(homeFolder, modelName, cmcSetupName, idName, c)
+function [elapsedTime]= strengthTester_para(homeFolder, modelName, cmcSetupName, idName, c)
 % Each muscle group was weakened in isolation. We reduced the maximum
 % isometric force until the CMC algorithm could no longer determine a set of muscle
 % excitations that would recreate the subject's dynamics with an error less than 2 degrees for all
@@ -36,6 +36,7 @@ cd(homeFolder)
 %%
 groupNames = fieldnames(muscGroups);
 nGroups    = length(groupNames);
+percentageStrength = fliplr([5:5:100]); 
 
 startLoop = tic;
 
@@ -52,27 +53,20 @@ parfor i = 1 : nGroups
         mkdir(workingFolder)
     end
     
-   muscleNames     = muscGroups.(groupNames{i});
+   % Define the muscles to reduce  
+   muscleNames  =    muscGroups.(groupNames{i});
 
-   percentageStrength = fliplr([5:5:100]); 
-  
    for u = 1 : length(percentageStrength)
-        
-           [t q] = opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,char(groupNames{i}),percentageStrength(u) );
-       
+      opensimComputation(homeFolder,workingFolder,cmcSetupName,modelName,muscleNames,char(groupNames{i}),percentageStrength(u) );
    end
    
-   
-   
 end
+
 elapsedTime = toc(startLoop);
 
+gmailEmail('The beast has finished her simulations',...
+            'simulation is finished')
 
-gmailEmail('dunne.jimmy@gmail.com',...
-                       'Drink a beer',...
-                       'simulation is finished',...
-                       'mymatlabdrone@gmail.com',...
-                       'idreamofsheep');
 
 end
 

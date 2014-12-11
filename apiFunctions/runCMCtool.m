@@ -24,16 +24,11 @@ cmcTool.setName('')
 display('Running CMC....')
 %% Run CMC
 cmcTool.print([workingFolder '\testSetup_' addName '.xml'] );
+clear cmcTool
 cmcTool = CMCTool( [workingFolder '\testSetup_' addName '.xml'] );
 cmcTool.run();
 
 clear cmcTool
 java.lang.System.gc()
-
-
-%% Success noise
-load chirp 
-sound(y,Fs)
-
 
 end

@@ -1,4 +1,4 @@
-function recipient = gmailEmail(recipient, message, subject, sender, psswd)
+function recipient = gmailEmail(subject, message, recipient, sender, psswd)
 % MATLABMAIL Send an email from a predefined gmail account.
 %
 % MATLABMAIL( recipient, message, subject )
@@ -22,10 +22,8 @@ function recipient = gmailEmail(recipient, message, subject, sender, psswd)
 %
 % See also SENDMAIL
  
- 
-if nargin<4
-    sender = 'example_address';
-    psswd = 'password_of_dummy_address';
+if nargin<3
+    [recipient,sender, psswd] = readEmailKey('E:\repo\stackJimmy\helperFunctions\strengthTester.keyholder');
 end
  
 setpref('Internet','E_mail',sender);

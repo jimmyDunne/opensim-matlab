@@ -1,9 +1,6 @@
-function [pcsa, muscleForce] = calcPCSA(muscleVolume, fiberLength,pennationAngle, p)
+function [pcsa, muscleForce] = calcPCSA(muscleVolume, fiberLength, pennationAngle, p)
 
-pcsa = ( muscleVolume*cos(pennationAngle) ) / (fiberLength);
-
+pcsa = ( muscleVolume* cos(deg2rad(pennationAngle)) ) / (fiberLength);
 muscleForce = pcsa*p;
 
-
-
-end
+end                               

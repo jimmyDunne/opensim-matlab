@@ -22,7 +22,7 @@ state =  myModel.initSystem();
 %   examining the moment arm contribution of the muscle across all
 %   coordinates. A muscle will contribute to any coodinate when the moment
 %   arm is non-zero.
-muscles = getCoord4Musc( myModel , state);
+muscleCoordinates = getCoord4Musc( myModel , state);
 
 %% get the force length curves of 
 

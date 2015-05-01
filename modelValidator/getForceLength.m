@@ -1,13 +1,17 @@
-function muscles = getForceLength(myModel, state, muscles)
+function muscleCoordinates = getForceLength(myModel, state, MuscNames)
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
-MuscNames = fieldnames(muscles);
+muscleCoordinates = getCoord4Musc( myModel , state);
 
-for ii = 1 : length(MuscNames)
+if isempty(MuscNames)
+    MuscNames = fieldnames(muscleCoordinates);    
+end
+
+for i = 1 : length(MuscNames)
 
    % Get the muscle that is needed 
-   myForce = myModel.getMuscles().get(char(MuscNames(ii)));
+   myForce = myModel.getMuscles().get(MuscNames{i});
    % Get the muscleType of that myForce 
    muscleType = char(myForce.getConcreteClassName);
    % Get a reference to the concrete muscle class in the model
@@ -16,11 +20,11 @@ for ii = 1 : length(MuscNames)
    display(char(myMuscle))
    
    % Get the coordinate names for the muscle
-   coordNames = fieldnames( muscles.(MuscNames{ii}).coordinates );
+   coordNames = fieldnames( muscleCoordinates.(MuscNames{i}).coordinates );
    % get the number of coordinates for the muscle
    nCoords = length( coordNames ); 
    % matrix for storing the total complete fl curve 
-   flMatrix = zeros(2,3);
+   flMatrix = zeros(2,3);   
 
    for k = 1 : nCoords
        % Get the name of the coordinate
@@ -28,7 +32,7 @@ for ii = 1 : length(MuscNames)
        % Get an update reference to the coordinate
        updCoord = myModel.updCoordinateSet.get( char(coordNames(k)) );
        % Get the coordinate values from the existing structure 
-       coordRange = muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValue;
+       coordRange = muscleCoordinates.(MuscNames{i}).coordinates.(coordNames{k}).coordValue;
        % Create a zero matrix for storing data
        storageData = zeros( length(coordRange), 5 );
        
@@ -66,12 +70,12 @@ for ii = 1 : length(MuscNames)
    
    %%        
         % Store the coordinate value fiberLength and active Fibre force   
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}) = storageData ;    
+        muscleCoordinates.(MuscNames{i}).coordinates.(coordNames{k}) = storageData ;    
 
         % Reset the coordinate value back to zero
         updCoord.setValue(state, 0);
    end
    
     flMatrix(1:2, :) = [];
-    muscles.(MuscNames{ii}).forceLength = flMatrix ;
+    muscleCoordinates.(MuscNames{i}).forceLength = flMatrix ;
 end 

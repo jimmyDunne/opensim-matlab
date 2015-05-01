@@ -1,4 +1,4 @@
-function muscles = getCoord4Musc( myModel,state )
+function muscleCoordinates = getCoord4Musc( myModel , state)
 % Muscle Coordinate finder
 %   Find the coordinate's that each muscle crosses. This is done by
 %   examining the moment arm contribution of the muscle across all
@@ -11,11 +11,11 @@ nMusc = myModel.getMuscles().getSize();
 nCoord = myModel.getCoordinateSet().getSize();
 
 for i = 0 : nMusc-1
-    % get the muscles type buy getting the concrete Class Name
+    % get the muscleCoordinates type buy getting the concrete Class Name
     myForce = myModel.getMuscles().get(i);
-    muscleType = char(myForce.getConcreteClassName);
 
     % get a reference to the concrete muscle class in the model
+    muscleType = char(myForce.getConcreteClassName);
     eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
 
     % get a fresh matrix to dump coordinate values into 
@@ -46,7 +46,7 @@ for i = 0 : nMusc-1
         % Create an arrary of radian value's for the range
         coordRange = (aCoord.getRangeMin:0.01:aCoord.getRangeMax)';
         % add the coordinate's and their range values to the structure
-        eval(['muscles.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '.coordValue = [coordRange];' ])
+        eval(['muscleCoordinates.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '.coordValue = [coordRange];' ])
     end
     
 end 

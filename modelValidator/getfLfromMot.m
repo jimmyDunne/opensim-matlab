@@ -4,7 +4,7 @@ function muscles = getfLfromMot(myModel, muscles )
 %
 % 
 % Author: James Dunne.  Date: August 2014
-%
+% muscles = getfLfromMot(myModel, muscles )
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 

@@ -1,4 +1,4 @@
-function muscleCoordinates = getCoord4Musc(myModel,state,muscleName)
+function muscleCoordinates = getCoord4Musc_draft(myModel,state,muscleName)
 % Muscle Coordinate finder
 %   Find the coordinate's that each muscle crosses. This is done by
 %   examining the moment arm contribution of the muscle across all
@@ -7,6 +7,8 @@ function muscleCoordinates = getCoord4Musc(myModel,state,muscleName)
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
+
+nCoord = myModel.getCoordinateSet().getSize();
 % get the muscleCoordinates type buy getting the concrete Class Name
 myForce = myModel.getMuscles().get(muscleName);
 
@@ -42,7 +44,7 @@ for u = 1 : length(muscCoord)
     % Create an arrary of radian value's for the range
     coordRange = (aCoord.getRangeMin:0.01:aCoord.getRangeMax)';
     % add the coordinate's and their range values to the structure
-    eval(['muscleCoordinates.' char(myModel.getMuscles().get(i).getName) '.coordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '.coordValue = [coordRange];' ])
+    eval(['muscleCoordinates.' char(myModel.getCoordinateSet.get(muscCoord(u))) '.coordValue = [coordRange];' ])
 end
     
 

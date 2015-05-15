@@ -1,92 +1,92 @@
-function muscles = getfLfV(myModel, state, muscles)
+function muscles = getfLfV(myModel, state, muscleName, muscleCoordinates)
 
 import org.opensim.modeling.*      % Import OpenSim Libraries
 
-MuscNames = fieldnames(muscles);
+% Get the muscle that is needed 
+myForce = myModel.getMuscles().get(muscleName);
+% Get the muscleType of that myForce 
+muscleType = char(myForce.getConcreteClassName);
+% Get a reference to the concrete muscle class in the model
+eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
+% Display the muscle name
+display(char(myMuscle))
 
-       velocities = deg2rad( [-120:1:120] );
+% Get the coordinate names for the muscle
+coordNames = fieldnames(muscleCoordinates);
+% get the number of coordinates for the muscle
+nCoords = length( coordNames ); 
+% matrix for storing the total complete fl curve 
+flMatrix = zeros(2,4);  
 
-       
-for ii = 1 : length(MuscNames)
+% get an array of coodinaate values and speeds to set the pose of the model
+[coordinateValues coordinateSpeeds] = generateCoordinateValues(myModel,state,muscleName, muscleCoordinates);
 
-   % Get the muscle that is needed 
-   myForce = myModel.getMuscles().get(char(MuscNames(ii)));
-   % Get the muscleType of that myForce 
-   muscleType = char(myForce.getConcreteClassName);
-   % Get a reference to the concrete muscle class in the model
-   eval(['myMuscle =' muscleType '.safeDownCast(myForce);'])
-   % Display the muscle name
-   display(char(myMuscle))
+nFrames = length(coordinateValues);
+
+flfvCurve = [];
+
+state =  myModel.initSystem();
+
+
+for i = 1 : nFrames
+     
+    % Loop through and update the model coordinate value's
+    for j = 1 : nCoords
+        updCoord = myModel.updCoordinateSet.get(coordNames(j));
+        updCoord.setValue(state,  coordinateValues(i, j ) );
+        updCoord.setSpeedValue(state, rad2deg(coordinateSpeeds(i, j )));
+    end
+    
+        % Set the activation and fiber length
+        myMuscle.setActivation( state, 1 )
+        myMuscle.setDefaultFiberLength( 0.01 )
+        myMuscle.setFiberLength( state, myMuscle.getOptimalFiberLength )
+        % Equilibrate the forces from the activation 
+        myModel.equilibrateMuscles( state );
    
-   % Get the coordinate names for the muscle
-   coordNames = fieldnames( muscles.(MuscNames{ii}).coordinates );
-   % get the number of coordinates for the muscle
-   nCoords = length( coordNames ); 
-   % Get the maximum contraction velocity. This is in fibre length's per
-   % second. 
-   %%
+     % Store all the data in the zero matrix
+     rowData = [...
+        myMuscle.getFiberLength(state) ...    
+        myMuscle.getFiberVelocity(state) ...
+        myMuscle.getNormalizedFiberLength(state) ...
+        myMuscle.getNormalizedFiberVelocity(state) ...   
+        myMuscle.getActiveFiberForce(state) ...
+        myMuscle.getPassiveFiberForce(state) ...      
+        myMuscle.getTendonLength(state) ...             
+        myMuscle.getTendonForce(state)];              
 
-   for k = 1 : nCoords
-       % Get the name of the coordinate
-       aCoord = myModel.getCoordinateSet.get( char(coordNames(k)) );
-       % Get an update reference to the coordinate
-       updCoord = myModel.updCoordinateSet.get( char(coordNames(k)) );
-       % Get the coordinate values from the existing structure 
-       coordRange = muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValue;
-       
-       
-           % Loop through each coordinate value and get get the fibre
-           % legnth's, fiber velocities force's. 
-           for j = 1 : length( coordRange )
-                % Get a current coordinate value
-                coordValue = coordRange(j);
-                % Set the coordinate value in the state
-                updCoord.setValue(state, coordValue);
-                
-                % Set the activation and fiber length
-                myMuscle.setActivation( state, 1 )
-                myMuscle.setFiberLength( state, 0.01 )
-                
-                % Set the speed of the Coordinate Value
-                updCoord.setSpeedValue(state, 0 );
-                % Equilibrate the forces from the activation 
-                myModel.equilibrateMuscles( state )
+        flfvCurve = [flfvCurve;rowData];
+end
 
-                
-                for i = 1 : length(velocities)
-                    
-                    % Set the speed of the Coordinate Value
-                    updCoord.setSpeedValue(state, velocities(i) );
 
-                    % Equilibrate the forces from the activation 
-                    myModel.equilibrateMuscles( state );
-                    
-                    coordSpeedArray(j,i) = rad2deg(velocities(i));
-                    coordValueArray(j,i) = rad2deg(coordValue);
-                    fiberlength(j,i) = myMuscle.getFiberLength(state);
-                    fiberlengthNorm(j,i) = myMuscle.getNormalizedFiberLength(state);
-                    
-                    % Get the Fiber velocity
-                    fiberVelocity(j,i) = myMuscle.getFiberVelocity(state);
-                    % Get the Normalised Fiber Velocity 
-                    fiberVelocityNorm(j,i) = myMuscle.getNormalizedFiberVelocity(state);
-                    % Get the Fiber force
-                    fiberForce(j,i)    = myForce.getActiveFiberForce(state);
-   
-                end
-           end
-        
-        % Store the coordinate value fiberLength and active Fibre force   
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordValuePlot   = coordValueArray ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).coordSpeedArray   = coordSpeedArray ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlength     = fiberlength ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberlengthNorm = fiberlengthNorm ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocity   = fiberVelocity ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberVelocityNorm   = fiberVelocityNorm ; 
-        muscles.(MuscNames{ii}).coordinates.(coordNames{k}).fiberForce      = fiberForce ; 
-        
-        % Reset the coordinate value back to zero
-        updCoord.setValue(state, 0);
-   end
-   %%
-end 
+
+flcurve = flfvCurve(find( sum(coordinateSpeeds,2) == 0 ), :); 
+flcurve(end,:) = [];
+
+fvcurve = flfvCurve(find( sum(coordinateSpeeds,2) ~= 0 ), :); 
+fvcurve(end,:) = [];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+

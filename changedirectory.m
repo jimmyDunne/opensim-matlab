@@ -2,7 +2,7 @@ function changedirectory(varargin)
 % Changes the Matlab current folder from input string
 
 
-data = [{'sandbox-scripts'} {'/Users/jimmy/repository/opensim-master/opensim-core/OpenSim/Sandbox/MatlabScripts'};...
+stringList = [{'sandbox-scripts'} {'/Users/jimmy/repository/opensim-master/opensim-core/OpenSim/Sandbox/MatlabScripts'};...
         {'apl'} {'/Users/jimmy/Dropbox/amjr_consulting/johnhopkins-apl/work'};...
         {'opensim-matlab'} {'/Users/jimmy/repository/opensim-master/opensim-core/Bindings/Java/Matlab/'};...
         {'noise'} {'/Users/jimmy/repository/kinematicNoise'};...
@@ -20,18 +20,17 @@ data = [{'sandbox-scripts'} {'/Users/jimmy/repository/opensim-master/opensim-cor
     
     
 if ~nargin
-    display(data(:,1))
+    display(stringList(:,1))
     return
 elseif nargin
     name = char(varargin{1});
 end
 
-
 if strcmp(name, 'list')
-    display(data(:,1))
+    display(stringList(:,1))
 else
     
-    Index = find(not(cellfun('isempty', strfind(data(:,1), name))));
-    disp(['Changing working directory to ' char(data(Index, 2)) ]);
-    cd(char(data(Index, 2)))
+    Index = find(not(cellfun('isempty', strfind(stringList(:,1), name))));
+    disp(['Changing working directory to ' char(stringList(Index, 2)) ]);
+    cd(char(stringList(Index, 2)))
 end

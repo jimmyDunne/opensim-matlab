@@ -26,7 +26,8 @@ classdef TRCWorker  < matlab.mixin.SetGet
             elseif isempty(obj.path)
                 error('path not set. use setPath() to set a file path')
             end
-            
+            % edit the marker names for errors (spaces, *, ...)
+            obj.updateMarkerNames()
             % define the absolute path to the file
             fullfilepath = fullfile(obj.path, [obj.name '.trc']);
             
@@ -53,6 +54,23 @@ classdef TRCWorker  < matlab.mixin.SetGet
         end
    end
     methods (Access = private, Hidden = true)
+        function updateMarkerNames(obj)
+            table_clone = obj.table.clone();
+            labels = table_clone.getColumnLabels();
+            for i = 0 : labels.size() - 1
+                label = char(labels.get(i));
+            
+                 if ~isempty(strfind(label,' '))
+                    label = strrep(label,' ','_');
+                 elseif ~isempty(strfind(label,'*'))
+                    label = strrep(label,'*','_');
+                 end
+                 labels.set(i,label);
+            end
+            % set the column labels
+            table_clone().setColumnLabels(labels)
+            obj.setTable(table_clone)
+        end
         function tablecheck(obj,osimtable)
             
             if isempty(strfind(osimtable.getClass, 'TimeSeriesTable'))

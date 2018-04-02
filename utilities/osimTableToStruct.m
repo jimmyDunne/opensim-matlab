@@ -77,9 +77,8 @@ for iLabel = 0 : nLabels - 1
     
     % Get the osim table column label
     col_label  = char(osimtable.getColumnLabels.get(iLabel));
-    
-    % MATLAB structs must start with a letter, and can only contain
-    % letters, digits, and underscores.
+    % MATLAB structs must start with a Alpha-numeric character.
+    % It can only contain letters, digits, and underscores.
     % Remove an initial slash.
     col_label = regexprep(col_label, '^/', '');
     % Replace '/' and '|' if they are present.

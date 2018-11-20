@@ -1,14 +1,14 @@
 function table_rotated = osimRotateTableData(table, axisString, value)
 % Utility function for for rotating Vec3 TableData elements
-% about an axisString by value (in degrees). 
+% about an axisString by value (in degrees).
 % table         Vec3 dataTable
 % axisString    string 'x', 'y', or 'z'
 % value         double, in degrees
-%  
-% Example: rotate all (Vec3) elements in t by 90 degrees about the x axisString.                                     
-% t_r = rotateTableData(t, 'x', -90) 
+%
+% Example: rotate all (Vec3) elements in t by 90 degrees about the x axisString.
+% t_r = rotateTableData(t, 'x', -90)
 
-% Author: James Dunne
+% Written by: James Dunne
 
 %% import java libraries
 import org.opensim.modeling.*
@@ -41,10 +41,3 @@ for iRow = 0 : table_rotated.getNumRows() - 1
 end
 
 end
-
-
-
-
-
-
-

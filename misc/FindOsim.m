@@ -1,26 +1,25 @@
-function [OsimFileName] = FindOsim(DataDirectory,OsimFileName)
-%Search function for OSIM Files
+function [S C] = FindOsim(varargin)
+% Returns a Struct of osim files anywhere in (or below) an input path. If
+% no input, will search the current directory. 
 
-% This if loop searches determines if the variable OsimFileName exists. If
-% YES then it does nothing If NO then it will search the directory given to find a osim file.
-
-%Written by James Dunne
-%June 2010
-
-CurrentDirectory=cd;
-if isempty(OsimFileName)==1
-        cd(DataDirectory)
-        ModelFile=dir('*.osim')   ;
-        if isempty(ModelFile)==1
-            [OsimFileName]=uigetfile('*.osim','Model File',DataDirectory,'MultiSelect','off');
-        elseif length(ModelFile)==1
-            OsimFileName=char(ModelFile.name);
-        elseif length(ModelFile)>1
-            [OsimFileName]=uigetfile('*.osim','Model File',DataDirectory,'MultiSelect','off');
-        end
-else
-        OsimFileName=OsimFileName;
+if nargin == 0
+    path = cd;
+elseif nargin == 1
+    path = varargin{1};
 end
-       
-cd(CurrentDirectory)
+
+currentDir = cd;
+
+% Change Dir to input Dir
+cd(path)
+% Return a struct of osim files
+S = dir('**/*.osim');
+cd(currentDir);
+
+% Output as a cell array with full paths
+C = {};
+for i = 1 : length(S)
+    C(i) =  {fullfile(S(i).folder, S(i).name)};
+end
+
 end

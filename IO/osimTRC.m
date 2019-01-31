@@ -61,9 +61,9 @@ classdef osimTRC < matlab.mixin.SetGet
         end
         function labels = getMarkerLabels(obj)
             % Get the list of marker labels
-            labels = cell(obj.getNumMarkers(),1);
+            labels = strings(obj.getNumMarkers(),1);
             for i = 1 : obj.getNumMarkers()
-                labels(i) = {char(obj.workingTable.getColumnLabel(i-1))};
+                labels(i) = char(obj.workingTable.getColumnLabel(i-1));
             end
         end
         function table = getDataTableClone(obj)

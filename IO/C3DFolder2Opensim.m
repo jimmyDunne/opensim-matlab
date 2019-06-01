@@ -30,7 +30,6 @@ for i = 1 : length(c3ds)
     else 
         fullpath = fullfile(path, c3ds(i).name);
     end
-
     % Instantiate a osimC3D object    
     c3d = osimC3D(fullpath);
     % Rotate the c3d data (slow)

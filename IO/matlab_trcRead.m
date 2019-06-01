@@ -1,4 +1,4 @@
-function q = read_trcFile(fname)
+function q = matlab_trcRead(fname)
 % read_trcFile() uses Matlab methods ONLY
 %   Reads data from a trc file. Does not require OpenSim Libraries
 

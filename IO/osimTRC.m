@@ -116,6 +116,18 @@ classdef osimTRC < matlab.mixin.SetGet
             % Add the New Marker to the Table
             obj.addMarkerToTable(NewMarkerlabel,data)
         end
+        function addMarkerOffset(obj,mk1,vec3)
+            % import osim libs
+            import org.opensim.modeling.*
+            % Get a reference to the working table
+            wt = obj.workingTable;
+            for i = 0 : obj.getNumRows - 1
+                % Add the input offset to the marker location
+                vv = osimVec3ToArray( wt.getDependentColumn(mk1).get(i) ) + vec3;
+                % Update value in the table
+                wt.getDependentColumn(mk1).set(i, osimVec3FromArray(vv));
+            end
+        end
         function addFootProjectionMarker(obj, mk)
            % Compute the new projected location of the marker
            data = obj.getMarkerData(mk);
@@ -146,10 +158,8 @@ classdef osimTRC < matlab.mixin.SetGet
             if isempty(postfix) 
                 error('Function must have an input char i.e. _edited')
             end
-                
             % Compute an output path to use for writing to file
             outputPath = fullfile(obj.filepath,[obj.filename postfix '.trc']);
-
             % Write to file
             TRCFileAdapter().write( obj.workingTable, outputPath);
             disp(['Marker file written to ' outputPath]);

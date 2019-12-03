@@ -3,6 +3,7 @@
 
 # Matlab Files
 *.asv
+*.m~
 
 # OpenSim files
 *.txt

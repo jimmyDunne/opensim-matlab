@@ -184,7 +184,7 @@ classdef osimTRC < matlab.mixin.SetGet
                 markerlabels(i+1) = {char(labels.get(i))};
             end
             % Get all the marker labels in a model
-            markerset = model.getMarkerSet();
+            markerset w= model.getMarkerSet();
             modelmarkerlabels = {};
             for i = 0 : markerset.getSize() - 1 
                 modelmarkerlabels(i+1) = {char(markerset.get(i).getName())};

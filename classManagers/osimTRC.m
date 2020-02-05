@@ -92,9 +92,9 @@ classdef osimTRC < matlab.mixin.SetGet
                 error('Input data does not have 3 columns')
             end
             % Instantiate an empty Column vector of vec3's
-            markerVector = VectorOfVec3();
-            % Resize the Vector for the current table size
-            markerVector.resize(self.getNumRows,1);
+            markerVector = RowVectorVec3(self.getNumRows);
+%             % Resize the Vector for the current table size
+%             markerVector.resize(self.getNumRows,1);
             % Fill the vector with the input data
             for i = 0 : self.getNumRows - 1
                markerVector.set(i, osimVec3FromArray( data(i+1,:) ) );
